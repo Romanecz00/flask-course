@@ -16,7 +16,7 @@ def hello_world():
 
 @app.route("/<field>")
 def f_return(field):
-	if field.lower() in ['id', 'name', 'age', 'sex', 'location']:
+	if field.lower() in Person().get().keys():
 		rez = choice(dataset).get()[field.lower()]
 		return json.dumps({field:rez})
 	else:
@@ -32,6 +32,6 @@ def id_search(_id):
 
 @app.route("/count")
 def get_count():
-	return len(dataset)
+	return {'count':len(dataset)}
 
 
