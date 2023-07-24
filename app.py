@@ -14,14 +14,24 @@ def hello_world():
 	rez = choice(dataset)
 	return json.dumps(rez.get(), indent=2)
 
-@app.route("/name")
-def n_return():
-	rez = choice(dataset).get()['name']
-	return json.dumps({'name':rez})
+@app.route("/<field>")
+def f_return(field):
+	if field.lower() in ['id', 'name', 'age', 'sex', 'location']:
+		rez = choice(dataset).get()[field.lower()]
+		return json.dumps({field:rez})
+	else:
+		return "Error: no such field exists!\n", 404
 
 @app.route("/person/<int:_id>")
 def id_search(_id):
 	for i in dataset:
 		if i.get()['id'] == _id:
 			return i.get()
-	return "Error:No entity found with such ID!\n"
+	return "Error:No entity found with such ID!\n", 404
+	
+
+@app.route("/count")
+def get_count():
+	return len(dataset)
+
+
