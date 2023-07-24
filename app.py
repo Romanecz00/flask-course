@@ -19,7 +19,7 @@ def n_return():
 	rez = choice(dataset).get()['name']
 	return json.dumps({'name':rez})
 
-@app.route("/person/<int: _id>")
+@app.route("/person/<int:_id>")
 def id_search(_id):
 	for i in dataset:
 		if i.get()['id'] == _id:
