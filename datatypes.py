@@ -4,7 +4,7 @@ from random import randint
 
 class Person:
 	data = {'id':'','name':'', 'age':'', 'sex':'', 'location':''}
-	
+	fields=['name', 'age', 'sex', 'location']
 	def __init__(self, stuff={'id':-1, 'name':'Test instance', 'age':randint(0,120), 'sex':'NullPointerException', 'location':'in your walls'}):
 		self.data = stuff
 	
