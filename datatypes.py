@@ -16,6 +16,15 @@ class Person:
 			return self.data[mode.lower()]
 		else:
 			return "wrong mode"
+			
+	def _set(self, field, data):
+		if field in self.fields:
+			if type(data) in (int, str, float):
+				self.data[field] = data
+			else:
+				raise TypeError(f"wrong data type {type(data)} for field {field}\n")
+		else:
+			raise KeyError(f"wrong field key parameter {field}\n")
 	
 	def __cmp__(self, other):
 		if type(other) == type(self):

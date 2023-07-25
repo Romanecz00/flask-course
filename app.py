@@ -28,7 +28,7 @@ def field_search():
 	for k,v in data.items():
 		if k in Person().fields and type(v) in (int, str, float):
 			for p in dataset:
-				if p.get()[k] == v:
+				if str(p.get()[k]) == str(v):
 					return json.dumps(p.get())
 			return f"Error: person with {k} of \"{v}\" was not found", 404
 		else:
@@ -46,6 +46,20 @@ def field_search():
 	# 		return i.get()
 	# return "Error:No entity found with such ID!\n", 404
 	
+@app.route('/edit/<int:_id>', methods=['PUT'])
+def edit_person(_id):
+	data = request.json
+	for p in dataset:
+		if p.get()['id'] == _id:
+			for k,v in data.items():
+				if not k in p.fields:
+					return f"Error: wrong data field {k}", 400
+				try:
+					p._set(k, v)
+				except Exception as e:
+					return f"Internal Server Error", 500
+			return json.dumps(p.get())
+	return f"Error: no person with {_id} id found!\n", 404
 
 @app.route('/birth', methods=['POST', 'PUT']) #because birth is the /create-person for those of us who aren't psychopaths
 def create_person():
