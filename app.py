@@ -39,6 +39,20 @@ def field_search():
 	# return "Error:No entity found with such ID!\n", 404
 	
 
+@app.route('/birth', methods=['POST', 'PUT']) #because birth is the /create-person for those of us who aren't psychopaths
+def create_person():
+	data = request.json
+	flag = True
+	for i in ['name', 'age', 'sex', 'location']:
+		if not i in data.keys():
+			flag = False
+		elif type(data[i]) not in (int, str, float):
+			flag = False
+	if flag:
+		dataset.append(Person({'id':len(dataset)+1, 'name':data['name'], 'age':data['age'], 'sex':data['sex'], 'location':data['location']}))
+		return json.dumps({'id':len(dataset)+1, 'name':data['name'], 'age':data['age'], 'sex':data['sex'], 'location':data['location']})
+	return f'Error: invalid data. data: {data}\n', 400
+
 @app.route("/count")
 def get_count():
 	return {'count':len(dataset)}
