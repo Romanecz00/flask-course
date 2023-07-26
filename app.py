@@ -109,7 +109,7 @@ def get_quotes():
 	try:
 		quotes = call_db(f"SELECT * from quotes;")
 		if quotes:
-			return json.dumps(quotes)
+			return quotes
 	except Exception as e:
 		return f"Internal Server Error:\n{str(e)}\n", 500
 	return f'404', 404
@@ -120,7 +120,7 @@ def get_quote_by_id(quote_id):
 	try:
 		quotes = call_db(f"SELECT * from quotes where id is {quote_id}")[0]
 		if quotes:
-			return json.dumps(quotes)
+			return quotes
 	except Exception as e:
 		return f"Internal Server Error:\n{str(e)}\n", 500
 	return f"Quote with id={quote_id} not found", 404
