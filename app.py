@@ -129,8 +129,9 @@ def get_quote_by_id(quote_id):
 @app.route("/quotes/count")
 def quotes_count():
 	quotes = call_db('select * from quotes')
-	if quote
-	return {"count": len(quotes)}
+	if quotes:
+		return {"count": len(quotes)}
+	return {'count':0}
 # 
 # 
 # @app.route("/quotes", methods=["POST"])
