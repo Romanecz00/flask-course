@@ -82,35 +82,7 @@ def get_count():
 
 
 
-# about_me = {
-# 	"name": "Евгений",
-# 	"surname": "Юрченко",
-# 	"email": "eyurchenko@specialist.ru"
-# }
-# 
-# quotes = [
-# 	{
-# 		"id": 3,
-# 		"author": "Rick Cook",
-# 		"text": "Программирование сегодня — это гонка разработчиков программ, стремящихся писать программы с большей и лучшей идиотоустойчивостью, и вселенной, которая пытается создать больше отборных идиотов. Пока вселенная побеждает."
-# 	},
-# 	{
-# 		"id": 5,
-# 		"author": "Waldi Ravens",
-# 		"text": "Программирование на С похоже на быстрые танцы на только что отполированном полу людей с острыми бритвами в руках."
-# 	},
-# 	{
-# 		"id": 6,
-# 		"author": "Mosher’s Law of Software Engineering",
-# 		"text": "Не волнуйтесь, если что-то не работает. Если бы всё работало, вас бы уволили."
-# 	},
-# 	{
-# 		"id": 8,
-# 		"author": "Yoggi Berra",
-# 		"text": "В теории, теория и практика неразделимы. На практике это не так."
-# 	},
-# 
-# ]
+
 
 def call_db(cmd, db='test.db'):
 	try:
@@ -129,51 +101,36 @@ def call_db(cmd, db='test.db'):
 	except Exception as e:
 		raise RuntimeError(e)
 	else:
-		if len(data) == 1:
-			data = data[0]
-		return data
+		return [{'id':i[0], 'name':i[1], 'quote':i[2]} for i in data if len(i)==3]
 
 
-# http://127.0.0.1:5000/about
-# @app.route("/about")
-# def about_author():
-# 	return about_me
-
-
-# # GET: http://127.0.0.1:5000/quotes
 @app.route("/quotes")
 def get_quotes():
 	try:
 		quotes = call_db(f"SELECT * from quotes;")
 		if quotes:
-			rez = [{'id':i[0], 'name':i[1], 'quote':i[2]} for i in quotes if len(i)==3]
-			return json.dumps(rez)
+			return json.dumps(quotes)
 	except Exception as e:
 		return f"Internal Server Error:\n{str(e)}\n", 500
 	return f'404', 404
 
 
-# http://127.0.0.1:5000/quotes/2
-# http://127.0.0.1:5000/quotes/5
-# http://127.0.0.1:5000/quotes/10
-# http://127.0.0.1:5000/quotes/50
 @app.route("/quotes/<int:quote_id>")
 def get_quote_by_id(quote_id):
 	try:
-		quotes = call_db(f"SELECT * from quotes where id is {quote_id}")
+		quotes = call_db(f"SELECT * from quotes where id is {quote_id}")[0]
 		if quotes:
-			quote = {'id':quotes[0], 'name':quotes[1], 'quote':quotes[2]}
-			return json.dumps(quote)
+			return json.dumps(quotes)
 	except Exception as e:
 		return f"Internal Server Error:\n{str(e)}\n", 500
 	return f"Quote with id={quote_id} not found", 404
 
 
-# @app.route("/quotes/count")
-# def quotes_count():
-# 	return {
-# 		"count": len(quotes)
-# 	}
+@app.route("/quotes/count")
+def quotes_count():
+	quotes = call_db('select * from quotes')
+	if quote
+	return {"count": len(quotes)}
 # 
 # 
 # @app.route("/quotes", methods=["POST"])
