@@ -1,9 +1,10 @@
-from flask import Flask, request
-import json
+from flask import Flask, request, json
+import sqlite3 #json,
 from random import choice, randint
 from .datatypes import Person#, Quotary
 
 app = Flask(__name__)
+json.provider.DefaultJSONProvider.ensure_ascii = False
 
 dataset = []
 for i in range(0, 1000):
@@ -80,3 +81,118 @@ def get_count():
 	return {'count':len(dataset)}
 
 
+
+# about_me = {
+# 	"name": "Евгений",
+# 	"surname": "Юрченко",
+# 	"email": "eyurchenko@specialist.ru"
+# }
+# 
+# quotes = [
+# 	{
+# 		"id": 3,
+# 		"author": "Rick Cook",
+# 		"text": "Программирование сегодня — это гонка разработчиков программ, стремящихся писать программы с большей и лучшей идиотоустойчивостью, и вселенной, которая пытается создать больше отборных идиотов. Пока вселенная побеждает."
+# 	},
+# 	{
+# 		"id": 5,
+# 		"author": "Waldi Ravens",
+# 		"text": "Программирование на С похоже на быстрые танцы на только что отполированном полу людей с острыми бритвами в руках."
+# 	},
+# 	{
+# 		"id": 6,
+# 		"author": "Mosher’s Law of Software Engineering",
+# 		"text": "Не волнуйтесь, если что-то не работает. Если бы всё работало, вас бы уволили."
+# 	},
+# 	{
+# 		"id": 8,
+# 		"author": "Yoggi Berra",
+# 		"text": "В теории, теория и практика неразделимы. На практике это не так."
+# 	},
+# 
+# ]
+
+def call_db(cmd, db='test.db'):
+	try:
+		connection = sqlite3.connect(db)
+		# Создаем cursor, он позволяет делать SQL-запросы
+		cursor = connection.cursor()
+		# Выполняем запрос:
+		cursor.execute(cmd)
+		# Извлекаем результаты запроса
+		data = cursor.fetchall()
+		# Закрыть курсор:
+		cursor.close()
+		# Закрыть соединение:
+		connection.close()
+		
+	except Exception as e:
+		raise RuntimeError(e)
+	else:
+		if len(data) == 1:
+			data = data[0]
+		return data
+
+
+# http://127.0.0.1:5000/about
+# @app.route("/about")
+# def about_author():
+# 	return about_me
+
+
+# # GET: http://127.0.0.1:5000/quotes
+@app.route("/quotes")
+def get_quotes():
+	try:
+		quotes = call_db(f"SELECT * from quotes;")
+		if quotes:
+			rez = [{'id':i[0], 'name':i[1], 'quote':i[2]} for i in quotes if len(i)==3]
+			return json.dumps(rez)
+	except Exception as e:
+		return f"Internal Server Error:\n{str(e)}\n", 500
+	return f'404', 404
+
+
+# http://127.0.0.1:5000/quotes/2
+# http://127.0.0.1:5000/quotes/5
+# http://127.0.0.1:5000/quotes/10
+# http://127.0.0.1:5000/quotes/50
+@app.route("/quotes/<int:quote_id>")
+def get_quote_by_id(quote_id):
+	try:
+		quotes = call_db(f"SELECT * from quotes where id is {quote_id}")
+		if quotes:
+			quote = {'id':quotes[0], 'name':quotes[1], 'quote':quotes[2]}
+			return json.dumps(quote)
+	except Exception as e:
+		return f"Internal Server Error:\n{str(e)}\n", 500
+	return f"Quote with id={quote_id} not found", 404
+
+
+# @app.route("/quotes/count")
+# def quotes_count():
+# 	return {
+# 		"count": len(quotes)
+# 	}
+# 
+# 
+# @app.route("/quotes", methods=["POST"])
+# def create_quote():
+# 	new_quote = request.json
+# 	new_id = quotes[-1]["id"] + 1
+# 	new_quote["id"] = new_id
+# 	quotes.append(new_quote)
+# 	return new_quote, 201
+# 
+# 
+# @app.route("/quotes/<int:quote_id>", methods=['PUT'])
+# def edit_quote(quote_id):
+# 	new_data = request.json
+# 	for quote in quotes:
+# 		if quote["id"] == quote_id:
+# 			if new_data.get("author"):
+# 				quote["author"] = new_data["author"]
+# 			if new_data.get("text"):
+# 				quote["text"] = new_data["text"]
+# 			return quote, 200
+# 	return f"Quote with id={quote_id} not found", 404
