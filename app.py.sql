@@ -116,6 +116,22 @@ def call_db(cmd, db='test.db'):
 	else:
 		return [{'id':i[0], 'name':i[1], 'quote':i[2]} for i in data if len(i)==3]
 
+@app.route('/quotes/delete', methods=['POST', 'PUT'])
+def delete_quote():
+	req = request.json
+	call = 'DELETE FROM quotes WHERE '
+	for k,v in req.items():
+		if k in ['id','name','quote']:
+			call = call+f"{k} is {v}"
+		if k != req.items()[-1][0]:
+			call = call+' AND '
+	call = call+';'
+	try:
+		c = call_db(call)
+	except Exception as e:
+		return f"Internal Server Error; data: \n{str(e)}\n", 500
+	else:
+		return f"Operation has been completed successfully", 200
 
 @app.route("/quotes")
 def get_quotes():
